@@ -3,8 +3,13 @@
 import Vue from 'vue'
 import App from './App'
 import router from './router'
+import Navigation from './components/Navigation'
+import CineItem from './components/CineItem'
 
 Vue.config.productionTip = false
+
+Vue.component('app-nav', Navigation)
+Vue.component('cine-item', CineItem)
 
 /* eslint-disable no-new */
 new Vue({

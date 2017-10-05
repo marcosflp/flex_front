@@ -1,5 +1,5 @@
 <template>
-  <div class="hello">
+  <div id="hello1" class="hello">
     <h1>{{ msg }}</h1>
     <h2>Essential Links</h2>
     <ul>
@@ -17,18 +17,42 @@
       <li><a href="http://vue-loader.vuejs.org/" target="_blank">vue-loader</a></li>
       <li><a href="https://github.com/vuejs/awesome-vue" target="_blank">awesome-vue</a></li>
     </ul>
+
+    <div class="fetching-data">
+      <div v-if="has_data">
+        <h5>{{ data.title }}</h5>
+        <p>{{ data }}</p>
+      </div>
+      <div v-if="!has_data">
+        no data.
+        <button v-on:click="getData">get data</button>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
+
 export default {
   name: 'hello',
   data () {
     return {
-      msg: 'Welcome to Your Vue.js App'
+      msg: 'Welcome to Your Vue.js App',
+      has_data: false,
+      data: null
+    }
+  },
+  methods: {
+    getData: function () {
+      const url = 'https://api.themoviedb.org/3/movie/550?api_key=a3f25a106c9ceaae7d72ccbe758b72ab'
+      return this.$http.get(url).then(response => {
+        this.data = response.data
+        this.has_data = true
+      })
     }
   }
 }
+
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
