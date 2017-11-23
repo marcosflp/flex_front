@@ -1,9 +1,9 @@
 <template>
   <header id="navigation" class="ui fluid container">
         <div class="ui text menu">
-            <div class="item">
+            <!-- <div class="item">
                 <img src="{% static 'core/images/logo.png' %}">
-            </div>
+            </div> -->
 
             <a class="browse item nav">
                 Navegar<i class="dropdown icon"></i>
@@ -11,7 +11,7 @@
 
             <div class="right menu">
                 <div id="search" class="item">
-                    <form action="/search/" role="search">
+                    <form role="search" v-on:submit.prevent="onSubmit">
                         <div class="ui icon input">
                             <input type="search" name="q" placeholder="Pesquisar...">
                             <i class="search link icon"></i>
@@ -92,8 +92,22 @@
 </template>
 
 <script>
+import TheMovieDbApi from '@/api/themoviedb.js'
+
 export default {
-  name: 'navigation'
+  name: 'navigation',
+
+  methods: {
+    onSubmit () {
+      TheMovieDbApi.searchMovie($('#search form input')[0].value).then(response => {
+        console.log(response)
+      })
+
+      TheMovieDbApi.searchTvShow($('#search form input')[0].value).then(response => {
+        console.log(response)
+      })
+    }
+  }
 }
 </script>
 

@@ -12,6 +12,9 @@
   },
   "dependencies": {
     "axios": "^0.16.2",
+    "jquery": "^3.2.1",
+    "net": "^1.0.2",
+    "tls": "0.0.1",
     "vue": "^2.4.2",
     "vue-axios": "^2.0.2",
     "vue-router": "^2.7.0"
