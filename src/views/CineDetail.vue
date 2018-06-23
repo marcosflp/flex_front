@@ -115,7 +115,6 @@ export default {
 
     fetchTvShow () {
       TheMovieDbApi.getTvShow(this.cine_id).then(response => {
-        console.log(response.data)
         this.cine = response.data
 
         TheMovieDbApi.getTvShowVideos(this.cine_id).then(response => {

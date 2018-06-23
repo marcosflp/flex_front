@@ -6,4 +6,5 @@ module.exports = merge(prodEnv, {
 
   // Flex Backend domain
   FLEX_BASEURL: '"http://cloudatlas.org:8000/api/v1"',
+  LOCAL_FLEX_BASEURL: '"http://localhost:8000"'
 })

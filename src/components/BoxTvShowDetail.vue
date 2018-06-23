@@ -16,7 +16,7 @@
 
     <div id="tab-season" class="tab active">
       <div class="ui cards three column" v-if="season_list">
-        <div class="ui card" 
+        <div class="ui card"
              v-for="season in sorted_season_list"
              :key="season.id"
              @click="set_season(season)">
@@ -65,7 +65,7 @@
           <i class="film icon"></i> Episodes
         </h4>
 
-        <div class="ui cards three column">
+        <div class="ui cards four column grid">
           <div class="ui card"
               v-for="episode in episode_list"
               :key="episode.id">
@@ -99,10 +99,11 @@
     <div id="tab-download" class="tab">
       <div class="ui relaxed divided list" v-if="TorrentList">
         <div class="item"
-             v-for="torrent in TorrentList"
+             v-for="(torrent, torrent_indice) in TorrentList"
              :key="torrent.name">
-
           <div class="right floated content">
+            <!-- <a :href="torrent.link"><div class="ui button">Add</div></a> -->
+            <!-- <a @click="create_torrent(torrent_indice)"><div class="ui button">Add</div></a> -->
             <a :href="torrent.link"><div class="ui button">Add</div></a>
           </div>
 
@@ -117,13 +118,59 @@
       </div>
     </div>
 
+    <div id="tab-downloading" class="tab">
+      <table class="ui compact celled table">
+        <thead class="full-width">
+          <tr>
+            <th>Title</th>
+            <th>Size</th>
+            <th>Path</th>
+            <th>Status</th>
+            <th>Pause</th>
+          </tr>
+        </thead>
+        <tbody v-if="torrents.length > 0">
+          <tr v-for="torrent in torrents"
+              :key="torrent.id">
+            <td>{{ torrent.name }}</td>
+            <td>{{ torrent.size }}</td>
+            <td>{{ torrent.path }}</td>
+            <td>{{ torrent.status }}</td>
+
+            <td class="collapsing">
+              <div class="ui fitted slider checkbox">
+                <input type="checkbox"> <label></label>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+        <tfoot class="full-width">
+          <tr>
+            <th></th>
+            <th colspan="4">
+              <div class="ui right floated small primary labeled icon button">
+                <i class="user icon"></i> Add User
+              </div>
+              <div class="ui small  button">
+                Approve
+              </div>
+              <div class="ui small  disabled button">
+                Approve All
+              </div>
+            </th>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
   </div>
 
   <div class="ui grid controller serie">
     <div class="row">
       <button class="ui mini button" @click="open_tab('tab-trailler')">Traillers</button>
       <button class="ui mini button" @click="open_tab('tab-season')">Seasons</button>
-      <button class="ui mini button" @click="open_tab('tab-download')">Download</button>
+      <button class="ui mini button" @click="open_tab('tab-download')">Links</button>
+      <button class="ui mini button" @click="open_tab('tab-downloading')">Download</button>
     </div>
   </div>
 
@@ -145,7 +192,9 @@ export default {
       TorrentList: [],
       Season: null,
       season_list: [],
-      episode_list: []
+      episode_list: [],
+      current_episode: null,
+      torrents: []
     }
   },
 
@@ -194,6 +243,7 @@ export default {
     },
 
     fetch_episode_torrents (episode) {
+      this.current_episode = episode
       this.TorrentList = []
 
       const q = this.tvshow.name + ' S' + ('0' + this.Season.season_number).slice(-2) + 'E' + ('0' + episode.episode_number).slice(-2)
@@ -247,6 +297,31 @@ export default {
       this.open_tab('tab-episodes')
     },
 
+    create_torrent (torrentIndice) {
+      this.TorrentList[torrentIndice]
+
+      let torrent = {
+        'name': this.TorrentList[torrentIndice].name,
+        'type': 'tvshow',
+        'themoviedb_movie_id': this.current_episode.id,
+        'themoviedb_tvshow_id': this.current_episode.id,
+        'magnet_link': this.TorrentList[torrentIndice].link,
+        'size': this.TorrentList[torrentIndice].size[0] + this.TorrentList[torrentIndice].size[1]
+      }
+
+      let response = Flex.post('/api/v1/torrent/', null, torrent)
+      return response
+    },
+
+    list_downloading_torrents () {
+      this.torrents = []
+
+      let response = Flex.get_local('/api/v1/torrent/')
+      response.then(response => {
+        this.torrents = response['data']
+      })
+    },
+
     open_tab (tab) {
       const tabs = document.querySelectorAll('.contentInfo .tab')
 
@@ -257,6 +332,11 @@ export default {
       // get traillers
       if (tab === 'tab-trailler' && this.TraillerList.length === 0) {
         this.fetch_traillers()
+      }
+
+      // get torrents
+      if (tab === 'tab-downloading') {
+        this.list_downloading_torrents()
       }
 
       document.getElementById(tab).classList.add('active')
